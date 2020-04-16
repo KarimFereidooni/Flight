@@ -123,6 +123,7 @@ export default Vue.extend({
 
 <style scoped>
 .header {
+  background-color: #f8654e;
   background-image: url(/header.png);
   background-size: cover;
   background-position: center;
