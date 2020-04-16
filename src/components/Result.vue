@@ -1,25 +1,37 @@
 <template>
-  <v-data-table :headers="headers" :items="value" :items-per-page="5" class="elevation-1">
-    <template v-slot:item.MON="{ item }">
-      {{ getDayValues(item.days, "MON") }}
-    </template>
-    <template v-slot:item.TUE="{ item }">
-      {{ getDayValues(item.days, "TUE") }}
-    </template>
-    <template v-slot:item.WED="{ item }">
-      {{ getDayValues(item.days, "WED") }}
-    </template>
-    <template v-slot:item.THU="{ item }">
-      {{ getDayValues(item.days, "THU") }}
-    </template>
-    <template v-slot:item.FRI="{ item }">
-      {{ getDayValues(item.days, "FRI") }}
-    </template>
-    <template v-slot:item.STA="{ item }">
-      {{ getDayValues(item.days, "STA") }}
-    </template>
-    <template v-slot:item.SUN="{ item }">
-      {{ getDayValues(item.days, "SUN") }}
+  <v-data-table :headers="headers" :items="value" :items-per-page="50" hide-default-footer class="elevation-1">
+    <template v-slot:item="{ item }">
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>
+          <span class="disabled" v-if="isDisabled('MON')">Disabled</span>
+          <ResultFieldValue v-else :value="getDay(item.days, 'MON')" />
+        </td>
+        <td>
+          <span class="disabled" v-if="isDisabled('TUE')">Disabled</span>
+          <ResultFieldValue v-else :value="getDay(item.days, 'TUE')" />
+        </td>
+        <td>
+          <span class="disabled" v-if="isDisabled('WED')">Disabled</span>
+          <ResultFieldValue v-else :value="getDay(item.days, 'WED')" />
+        </td>
+        <td>
+          <span class="disabled" v-if="isDisabled('THU')">Disabled</span>
+          <ResultFieldValue v-else :value="getDay(item.days, 'THU')" />
+        </td>
+        <td>
+          <span class="disabled" v-if="isDisabled('FRI')">Disabled</span>
+          <ResultFieldValue v-else :value="getDay(item.days, 'FRI')" />
+        </td>
+        <td>
+          <span class="disabled" v-if="isDisabled('STA')">Disabled</span>
+          <ResultFieldValue v-else :value="getDay(item.days, 'STA')" />
+        </td>
+        <td>
+          <span class="disabled" v-if="isDisabled('SUN')">Disabled</span>
+          <ResultFieldValue v-else :value="getDay(item.days, 'SUN')" />
+        </td>
+      </tr>
     </template>
   </v-data-table>
 </template>
@@ -28,11 +40,18 @@
 import Vue from "vue";
 import { IFlight } from "@/models/IFlight";
 import { IDayValue } from "@/models/IDayValue";
+import ResultFieldValue from "@/components/ResultFieldValue.vue";
 
 export default Vue.extend({
+  components: {
+    ResultFieldValue
+  },
   props: {
     value: {
       type: Array as () => IFlight[]
+    },
+    disabledDays: {
+      type: Array as () => string[]
     }
   },
   data() {
@@ -90,15 +109,19 @@ export default Vue.extend({
     };
   },
   methods: {
-    getDayValues(data: IDayValue[], day: string) {
-      const value = data.find(x => x.day === day);
-      if (value) {
-        return `A:${value.A} B:${value.B} C:${value.C} D:${value.D}`;
-      } else {
-        return `A:${0} B:${0} C:${0} D:${0}`;
-      }
-      return "";
+    getDay(data: IDayValue[], day: string): IDayValue | undefined {
+      return data.find(x => x.day === day);
+    },
+    isDisabled(day: string) {
+      return this.disabledDays.some(x => x === day);
     }
   }
 });
 </script>
+
+<style scoped>
+.disabled {
+  font-size: 12px;
+  color: #b5acac;
+}
+</style>

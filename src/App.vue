@@ -5,10 +5,10 @@
       <v-stepper v-model="stepperValue">
         <v-stepper-header>
           <template v-for="(flight, index) of flights">
-            <v-stepper-step :key="`step${index}`" :step="index + 1">{{ flight.name }}</v-stepper-step>
+            <v-stepper-step editable :key="`step${index}`" :step="index + 1">{{ flight.name }}</v-stepper-step>
             <v-divider :key="`divider${index}`"></v-divider>
           </template>
-          <v-stepper-step step="4">Result</v-stepper-step>
+          <v-stepper-step editable :step="lastStep">Result</v-stepper-step>
         </v-stepper-header>
 
         <v-stepper-items>
@@ -17,7 +17,7 @@
               <Flight :value="flight" :disabledDays="disabledDays" />
             </div>
             <v-card-actions>
-              <v-btn color="primary" @click="goPrev">
+              <v-btn :disabled="stepperValue === 1" color="primary" @click="goPrev">
                 Previous
               </v-btn>
               <v-btn color="primary" @click="goNext">
@@ -26,9 +26,9 @@
             </v-card-actions>
           </v-stepper-content>
 
-          <v-stepper-content :step="flights.length + 1">
+          <v-stepper-content :step="lastStep">
             <div class="stepper-content">
-              <Result :value="flights" />
+              <Result :value="flights" :disabledDays="disabledDays" />
             </div>
             <v-card-actions>
               <v-btn color="primary" @click="stepperValue--">
@@ -42,6 +42,29 @@
         </v-stepper-items>
       </v-stepper>
     </v-content>
+    <v-dialog v-model="dialog" persistent max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Setting</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field dense outlined type="number" :min="3" label="Flight Count" v-model.number="flightCount"></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-select dense outlined multiple v-model="disabledDays" :items="days" label="Disabled Days"></v-select>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="closeDialog">Start</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -58,22 +81,12 @@ export default Vue.extend({
   },
   data() {
     return {
+      dialog: true,
+      flightCount: 3,
       stepperValue: 1,
-      disabledDays: ["WED", "FRI"],
-      flights: [
-        {
-          name: "Flight 1",
-          days: [{ day: "", MON: false, TUE: false, WED: false, THU: false, FRI: false, STA: false, SUN: false, A: 0, B: 0, C: 0, D: 0 }]
-        },
-        {
-          name: "Flight 2",
-          days: [{ day: "", MON: false, TUE: false, WED: false, THU: false, FRI: false, STA: false, SUN: false, A: 0, B: 0, C: 0, D: 0 }]
-        },
-        {
-          name: "Flight 3",
-          days: [{ day: "", MON: false, TUE: false, WED: false, THU: false, FRI: false, STA: false, SUN: false, A: 0, B: 0, C: 0, D: 0 }]
-        }
-      ] as IFlight[]
+      days: ["MON", "TUE", "WED", "THU", "FRI", "STA", "SUN"],
+      disabledDays: [],
+      flights: [] as IFlight[]
     };
   },
   methods: {
@@ -83,9 +96,26 @@ export default Vue.extend({
       }
     },
     goNext() {
-      if (this.stepperValue <= this.flights.length) {
+      if (this.stepperValue <= this.flightCount) {
         this.stepperValue++;
       }
+    },
+    async closeDialog() {
+      for (let i = 0; i < this.flightCount; i++) {
+        this.flights.push({
+          name: "Flight " + (i + 1),
+          days: [{ day: "", A: null, B: null, C: null, D: null }]
+        });
+      }
+      this.dialog = false;
+      this.stepperValue = this.lastStep;
+      await this.$nextTick();
+      this.stepperValue = 1;
+    }
+  },
+  computed: {
+    lastStep(): number {
+      return parseInt(this.flightCount.toString(), 10) + 1;
     }
   }
 });

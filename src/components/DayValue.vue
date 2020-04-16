@@ -1,21 +1,17 @@
 <template>
   <v-row class="px-4" justify="start" align="baseline">
-    <v-checkbox :disabled="isDisabled('MON')" v-model="value.MON" readonly @click.stop="handleDayChange('MON')" dense class="tick" label="MON"></v-checkbox>
-    <v-checkbox v-model="value.TUE" readonly @click.stop="handleDayChange('TUE')" dense class="tick" label="TUE"></v-checkbox>
     <v-checkbox
-      :disabled="isDisabled('WED')"
-      v-model="value.WED"
+      v-for="(day, index) of days"
+      :key="day"
+      :disabled="isDisabled(day)"
+      v-model="dayValues[index].value"
       readonly
-      @click.stop="handleDayChange('WED')"
+      @click.stop="handleDayChange(day, index)"
       dense
       class="tick"
-      label="WED"
-    ></v-checkbox>
-    <v-checkbox disabled v-model="value.THU" readonly @click.stop="handleDayChange('THU')" dense class="tick" label="THU"></v-checkbox>
-    <v-checkbox v-model="value.FRI" readonly @click.stop="handleDayChange('FRI')" dense class="tick" label="FRI"></v-checkbox>
-    <v-checkbox v-model="value.STA" readonly @click.stop="handleDayChange('STA')" dense class="tick" label="STA"></v-checkbox>
-    <v-checkbox v-model="value.SUN" readonly @click.stop="handleDayChange('SUN')" dense class="tick" label="SUN"></v-checkbox>
-    <v-select dense class="select" multiple v-model="selectedItems" :items="items" label="" solo></v-select>
+      :label="day"
+    />
+    <v-select v-if="value.day" dense class="select" multiple v-model="selectedItems" :items="items" label="" solo></v-select>
     <v-text-field type="number" v-if="aTextField" v-model="value.A" class="text" label="A"></v-text-field>
     <v-text-field type="number" v-if="bTextField" v-model="value.B" class="text" label="B"></v-text-field>
     <v-text-field type="number" v-if="cTextField" v-model="value.C" class="text" label="C"></v-text-field>
@@ -39,8 +35,18 @@ export default Vue.extend({
   },
   data() {
     return {
+      items: ["A", "B", "C", "D"],
       selectedItems: [] as string[],
-      items: ["A", "B", "C", "D"]
+      days: ["MON", "TUE", "WED", "THU", "FRI", "STA", "SUN"],
+      dayValues: [
+        { day: "MON", value: this.value.day === "MON" },
+        { day: "TUE", value: this.value.day === "TUE" },
+        { day: "WED", value: this.value.day === "WED" },
+        { day: "THU", value: this.value.day === "THU" },
+        { day: "FRI", value: this.value.day === "FRI" },
+        { day: "STA", value: this.value.day === "STA" },
+        { day: "SUN", value: this.value.day === "SUN" }
+      ]
     };
   },
   computed: {
@@ -57,24 +63,41 @@ export default Vue.extend({
       return this.selectedItems.some(x => x === "D");
     },
     anyDaySelected(): boolean {
-      let r = false;
-      const keys = Object.keys(this.value);
-      for (const key of keys) {
-        if (this.value[key] === true) {
-          r = true;
-          break;
-        }
+      return this.dayValues.some(x => x.value === true);
+    }
+  },
+  watch: {
+    aTextField(newValue) {
+      if (!newValue) {
+        this.value.A = null;
       }
-      return r;
+    },
+    bTextField(newValue) {
+      if (!newValue) {
+        this.value.B = null;
+      }
+    },
+    cTextField(newValue) {
+      if (!newValue) {
+        this.value.C = null;
+      }
+    },
+    dTextField(newValue) {
+      if (!newValue) {
+        this.value.D = null;
+      }
     }
   },
   methods: {
-    handleDayChange(day: string) {
+    handleDayChange(day: string, index: number) {
+      if (this.isDisabled(day)) {
+        return;
+      }
       if (!this.anyDaySelected) {
-        this.value[day] = !this.value[day];
+        this.dayValues[index].value = !this.dayValues[index].value;
         this.value.day = day;
       } else {
-        if (this.value[day]) {
+        if (this.dayValues[index].value) {
           this.$emit("removeDay", day);
         } else {
           this.$emit("addDay", day);
@@ -82,7 +105,7 @@ export default Vue.extend({
       }
     },
     isDisabled(day: string) {
-      return this.disabledDays.findIndex(x => x === day) >= 0;
+      return this.disabledDays.some(x => x === day);
     }
   }
 });

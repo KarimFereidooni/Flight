@@ -1,14 +1,7 @@
 export interface IDayValue {
   day: string;
-  MON: boolean;
-  TUE: boolean;
-  WED: boolean;
-  THU: boolean;
-  FRI: boolean;
-  STA: boolean;
-  SUN: boolean;
-  A: number;
-  B: number;
-  C: number;
-  D: number;
+  A: number | null;
+  B: number | null;
+  C: number | null;
+  D: number | null;
 }

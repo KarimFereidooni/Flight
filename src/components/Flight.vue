@@ -1,6 +1,13 @@
 <template>
   <div>
-    <DayValue :key="dayValue.day" :value="dayValue" v-for="dayValue in value.days" :disabledDays="disabledDays" @addDay="handleAddDay" @removeDay="handleRemoveDay" />
+    <DayValue
+      :key="dayValue.day"
+      :value="dayValue"
+      v-for="dayValue in value.days"
+      :disabledDays="disabledDays"
+      @addDay="handleAddDay"
+      @removeDay="handleRemoveDay"
+    />
   </div>
 </template>
 
@@ -26,17 +33,10 @@ export default Vue.extend({
       if (!this.value.days.some(x => x.day === day)) {
         this.value.days.push({
           day,
-          MON: day === "MON",
-          TUE: day === "TUE",
-          WED: day === "WED",
-          THU: day === "THU",
-          FRI: day === "FRI",
-          STA: day === "STA",
-          SUN: day === "SUN",
-          A: 0,
-          B: 0,
-          C: 0,
-          D: 0
+          A: null,
+          B: null,
+          C: null,
+          D: null
         });
       }
     },
@@ -47,7 +47,10 @@ export default Vue.extend({
           this.value.days.splice(index, 1);
         } else {
           this.value.days[index].day = "";
-          this.value.days[index][day] = false;
+          this.value.days[index].A = null;
+          this.value.days[index].B = null;
+          this.value.days[index].C = null;
+          this.value.days[index].D = null;
         }
       }
     }
