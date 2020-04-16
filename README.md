@@ -2,7 +2,7 @@
 
 Please download https://github.com/KarimFereidooni/Flight/releases/download/1.0/dist.zip
 
-unzip file and open *index.html*
+unzip files and open **index.html**
 
 ## Project setup
 ```
