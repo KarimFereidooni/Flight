@@ -1,5 +1,9 @@
 # SPH
 
+Please download https://github.com/KarimFereidooni/Flight/releases/download/1.0/dist.zip
+
+unzip files and open **index.html**
+
 ## Project setup
 ```
 yarn install
