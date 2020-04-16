@@ -1,4 +1,4 @@
-# sph
+# SPH
 
 ## Project setup
 ```
